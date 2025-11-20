@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { IQuestionRepository } from '../../../domain/questions/repositories/question-repository.interface';
+import { QUESTION_REPOSITORY } from '../../../domain/questions/repositories/question-repository.token';
 import { Question } from '../../../domain/questions/entities/question.entity';
 import { QuestionTitle } from '../../../domain/questions/value-objects/question-title.vo';
 import { QuestionContent } from '../../../domain/questions/value-objects/question-content.vo';
@@ -17,7 +18,10 @@ export interface CreateQuestionCommand {
 
 @Injectable()
 export class CreateQuestionUseCase {
-  constructor(private readonly questionRepository: IQuestionRepository) {}
+  constructor(
+    @Inject(QUESTION_REPOSITORY)
+    private readonly questionRepository: IQuestionRepository,
+  ) {}
 
   async execute(command: CreateQuestionCommand): Promise<Question> {
     // Value Objects 생성 (도메인 검증 수행)
