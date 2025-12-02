@@ -51,8 +51,6 @@ export class Visibility {
       return false;
     }
 
-    return (
-      this._type === other._type && this._password === other._password
-    );
+    return this._type === other._type && this._password === other._password;
   }
 }
