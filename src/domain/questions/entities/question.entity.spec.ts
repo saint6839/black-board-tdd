@@ -1,8 +1,8 @@
-import { Question } from './question.entity';
-import { QuestionTitle } from '../value-objects/question-title.vo';
-import { QuestionContent } from '../value-objects/question-content.vo';
 import { Category } from '../value-objects/category.vo';
+import { QuestionContent } from '../value-objects/question-content.vo';
+import { QuestionTitle } from '../value-objects/question-title.vo';
 import { Visibility } from '../value-objects/visibility.vo';
+import { Question } from './question.entity';
 
 describe('Question Entity', () => {
   const createValidQuestion = () => {
@@ -20,7 +20,9 @@ describe('Question Entity', () => {
       const question = createValidQuestion();
 
       expect(question.title.value).toBe('NestJS 질문입니다');
-      expect(question.content.value).toBe('이것은 10자 이상의 질문 내용입니다.');
+      expect(question.content.value).toBe(
+        '이것은 10자 이상의 질문 내용입니다.',
+      );
       expect(question.category.value).toBe('JavaScript');
       expect(question.visibility.isPublic()).toBe(true);
       expect(question.authorId).toBe('author-123');

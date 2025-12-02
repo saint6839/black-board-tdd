@@ -1,6 +1,7 @@
-import { CreateQuestionUseCase } from './create-question.usecase';
-import { IQuestionRepository } from '../../../domain/questions/repositories/question-repository.interface';
 import { Question } from '../../../domain/questions/entities/question.entity';
+import { IQuestionRepository } from '../../../domain/questions/repositories/question-repository.interface';
+import { QuestionVisibility } from '../../../domain/questions/value-objects/visibility.vo';
+import { CreateQuestionUseCase } from './create-question.usecase';
 
 describe('CreateQuestionUseCase', () => {
   let useCase: CreateQuestionUseCase;
@@ -21,9 +22,10 @@ describe('CreateQuestionUseCase', () => {
     it('유효한 입력으로 질문을 생성할 수 있다', async () => {
       const command = {
         title: 'NestJS에서 의존성 주입은 어떻게 하나요?',
-        content: '생성자 주입과 속성 주입의 차이점이 궁금합니다. 자세히 알려주세요.',
+        content:
+          '생성자 주입과 속성 주입의 차이점이 궁금합니다. 자세히 알려주세요.',
         category: 'JavaScript',
-        visibility: 'PUBLIC' as const,
+        visibility: QuestionVisibility.PUBLIC,
         authorId: 'user-123',
       };
 
@@ -35,10 +37,10 @@ describe('CreateQuestionUseCase', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBeDefined();
-      expect(result.title.value).toBe(command.title);
-      expect(result.content.value).toBe(command.content);
-      expect(result.category.value).toBe(command.category);
-      expect(result.visibility.isPublic()).toBe(true);
+      expect(result.title).toBe(command.title);
+      expect(result.content).toBe(command.content);
+      expect(result.category).toBe(command.category);
+      expect(result.visibility).toBe(QuestionVisibility.PUBLIC);
       expect(result.authorId).toBe(command.authorId);
       expect(result.isResolved).toBe(false);
       expect(result.likeCount).toBe(0);
@@ -50,7 +52,7 @@ describe('CreateQuestionUseCase', () => {
         title: '비공개 질문입니다',
         content: '이것은 10자 이상의 비공개 질문 내용입니다.',
         category: 'React',
-        visibility: 'PRIVATE' as const,
+        visibility: QuestionVisibility.PRIVATE,
         password: 'mySecret123',
         authorId: 'user-456',
       };
@@ -61,8 +63,16 @@ describe('CreateQuestionUseCase', () => {
 
       const result = await useCase.execute(command);
 
-      expect(result.visibility.isPrivate()).toBe(true);
-      expect(result.visibility.verifyPassword('mySecret123')).toBe(true);
+      expect(result.visibility).toBe(QuestionVisibility.PRIVATE);
+
+      const savedQuestion = mockRepository.save.mock.calls[0]?.[0];
+      expect(savedQuestion).toBeDefined();
+      if (savedQuestion) {
+        expect(savedQuestion.visibility.isPrivate()).toBe(true);
+        expect(savedQuestion.visibility.verifyPassword('mySecret123')).toBe(
+          true,
+        );
+      }
       expect(mockRepository.save).toHaveBeenCalledTimes(1);
     });
 
@@ -71,7 +81,7 @@ describe('CreateQuestionUseCase', () => {
         title: '비공개 질문입니다',
         content: '이것은 10자 이상의 비공개 질문 내용입니다.',
         category: 'React',
-        visibility: 'PRIVATE' as const,
+        visibility: QuestionVisibility.PRIVATE,
         authorId: 'user-789',
       };
 
@@ -81,8 +91,14 @@ describe('CreateQuestionUseCase', () => {
 
       const result = await useCase.execute(command);
 
-      expect(result.visibility.isPrivate()).toBe(true);
-      expect(result.visibility.verifyPassword('0000')).toBe(true);
+      expect(result.visibility).toBe(QuestionVisibility.PRIVATE);
+
+      const savedQuestion = mockRepository.save.mock.calls[0]?.[0];
+      expect(savedQuestion).toBeDefined();
+      if (savedQuestion) {
+        expect(savedQuestion.visibility.isPrivate()).toBe(true);
+        expect(savedQuestion.visibility.verifyPassword('0000')).toBe(true);
+      }
       expect(mockRepository.save).toHaveBeenCalledTimes(1);
     });
   });
@@ -93,7 +109,7 @@ describe('CreateQuestionUseCase', () => {
         title: '제',
         content: '이것은 10자 이상의 질문 내용입니다.',
         category: 'JavaScript',
-        visibility: 'PUBLIC' as const,
+        visibility: QuestionVisibility.PUBLIC,
         authorId: 'user-123',
       };
 
@@ -109,7 +125,7 @@ describe('CreateQuestionUseCase', () => {
         title: 'a'.repeat(51),
         content: '이것은 10자 이상의 질문 내용입니다.',
         category: 'JavaScript',
-        visibility: 'PUBLIC' as const,
+        visibility: QuestionVisibility.PUBLIC,
         authorId: 'user-123',
       };
 
@@ -125,7 +141,7 @@ describe('CreateQuestionUseCase', () => {
         title: '',
         content: '이것은 10자 이상의 질문 내용입니다.',
         category: 'JavaScript',
-        visibility: 'PUBLIC' as const,
+        visibility: QuestionVisibility.PUBLIC,
         authorId: 'user-123',
       };
 
@@ -143,7 +159,7 @@ describe('CreateQuestionUseCase', () => {
         title: '유효한 제목입니다',
         content: '짧은내용',
         category: 'JavaScript',
-        visibility: 'PUBLIC' as const,
+        visibility: QuestionVisibility.PUBLIC,
         authorId: 'user-123',
       };
 
@@ -159,7 +175,7 @@ describe('CreateQuestionUseCase', () => {
         title: '유효한 제목입니다',
         content: 'a'.repeat(2001),
         category: 'JavaScript',
-        visibility: 'PUBLIC' as const,
+        visibility: QuestionVisibility.PUBLIC,
         authorId: 'user-123',
       };
 
@@ -177,7 +193,7 @@ describe('CreateQuestionUseCase', () => {
         title: '유효한 제목입니다',
         content: '이것은 10자 이상의 질문 내용입니다.',
         category: 'InvalidCategory',
-        visibility: 'PUBLIC' as const,
+        visibility: QuestionVisibility.PUBLIC,
         authorId: 'user-123',
       };
 
@@ -195,7 +211,7 @@ describe('CreateQuestionUseCase', () => {
         title: 'NestJS 질문입니다',
         content: '이것은 10자 이상의 질문 내용입니다.',
         category: 'JavaScript',
-        visibility: 'PUBLIC' as const,
+        visibility: QuestionVisibility.PUBLIC,
         authorId: 'user-123',
       };
 

@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsIn, IsOptional, MinLength, MaxLength } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import { QuestionVisibility } from '../../../domain/questions/value-objects/visibility.vo';
 
 export class CreateQuestionDto {
   @IsString()
@@ -16,14 +24,15 @@ export class CreateQuestionDto {
   @IsString()
   @IsNotEmpty()
   @IsIn(['JavaScript', 'React', '테스트', '기타'], {
-    message: '유효하지 않은 카테고리입니다. (JavaScript, React, 테스트, 기타 중 선택)',
+    message:
+      '유효하지 않은 카테고리입니다. (JavaScript, React, 테스트, 기타 중 선택)',
   })
   category!: string;
 
   @IsString()
   @IsNotEmpty()
-  @IsIn(['PUBLIC', 'PRIVATE'])
-  visibility!: 'PUBLIC' | 'PRIVATE';
+  @IsIn([QuestionVisibility.PUBLIC, QuestionVisibility.PRIVATE])
+  visibility!: QuestionVisibility;
 
   @IsString()
   @IsOptional()

@@ -1,15 +1,18 @@
-type VisibilityType = 'PUBLIC' | 'PRIVATE';
+export enum QuestionVisibility {
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE',
+}
 
 export class Visibility {
   private static readonly DEFAULT_PASSWORD = '0000';
 
   private constructor(
-    private readonly _type: VisibilityType,
+    private readonly _type: QuestionVisibility,
     private readonly _password?: string,
   ) {}
 
   static createPublic(): Visibility {
-    return new Visibility('PUBLIC');
+    return new Visibility(QuestionVisibility.PUBLIC);
   }
 
   static createPrivate(password?: string): Visibility {
@@ -18,15 +21,15 @@ export class Visibility {
         ? Visibility.DEFAULT_PASSWORD
         : password;
 
-    return new Visibility('PRIVATE', normalizedPassword);
+    return new Visibility(QuestionVisibility.PRIVATE, normalizedPassword);
   }
 
   isPublic(): boolean {
-    return this._type === 'PUBLIC';
+    return this._type === QuestionVisibility.PUBLIC;
   }
 
   isPrivate(): boolean {
-    return this._type === 'PRIVATE';
+    return this._type === QuestionVisibility.PRIVATE;
   }
 
   hasPassword(): boolean {
