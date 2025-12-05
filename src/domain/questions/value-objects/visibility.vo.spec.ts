@@ -1,4 +1,4 @@
-import { QuestionVisibility, Visibility } from './visibility.vo';
+import { Visibility } from './visibility.vo';
 
 describe('Visibility', () => {
   describe('전체 공개 설정', () => {
