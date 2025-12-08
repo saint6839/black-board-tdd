@@ -17,8 +17,3 @@ export interface GetQuestionResult {
   authorId: string;
   createdAt: Date;
 }
-
-
-
-
-
