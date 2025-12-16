@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
-import { QuestionTitle } from '../value-objects/question-title.vo';
-import { QuestionContent } from '../value-objects/question-content.vo';
 import { Category } from '../value-objects/category.vo';
+import { QuestionContent } from '../value-objects/question-content.vo';
+import { QuestionTitle } from '../value-objects/question-title.vo';
 import { Visibility } from '../value-objects/visibility.vo';
 
 interface QuestionProps {
@@ -23,6 +23,8 @@ export class Question {
   private _likeCount: number;
   private _commentCount: number;
   private readonly _createdAt: Date;
+  private _isDeleted: boolean;
+  private _deletedAt: Date | null;
 
   private constructor(props: QuestionProps, id?: string) {
     this._id = id ?? randomUUID();
@@ -35,6 +37,8 @@ export class Question {
     this._likeCount = 0;
     this._commentCount = 0;
     this._createdAt = new Date();
+    this._isDeleted = false;
+    this._deletedAt = null;
   }
 
   static create(props: QuestionProps, id?: string): Question {
@@ -82,6 +86,14 @@ export class Question {
     return this._createdAt;
   }
 
+  get isDeleted(): boolean {
+    return this._isDeleted;
+  }
+
+  get deletedAt(): Date | null {
+    return this._deletedAt;
+  }
+
   // 해결 여부 관리
   markAsResolved(): void {
     this._isResolved = true;
@@ -125,5 +137,11 @@ export class Question {
   // 접근 권한 확인
   canAccess(password?: string): boolean {
     return this._visibility.verifyPassword(password ?? '');
+  }
+
+  // 소프트 삭제
+  markAsDeleted(): void {
+    this._isDeleted = true;
+    this._deletedAt = new Date();
   }
 }

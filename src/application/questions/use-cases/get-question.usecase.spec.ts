@@ -18,7 +18,9 @@ describe('GetQuestionUseCase', () => {
     return Question.create(
       {
         title: QuestionTitle.create('공개 질문입니다'),
-        content: QuestionContent.create('이것은 10자 이상의 공개 질문 내용입니다.'),
+        content: QuestionContent.create(
+          '이것은 10자 이상의 공개 질문 내용입니다.',
+        ),
         category: Category.create('JavaScript'),
         visibility: Visibility.createPublic(),
         authorId: 'author-123',
@@ -31,7 +33,9 @@ describe('GetQuestionUseCase', () => {
     return Question.create(
       {
         title: QuestionTitle.create('비공개 질문입니다'),
-        content: QuestionContent.create('이것은 10자 이상의 비공개 질문 내용입니다.'),
+        content: QuestionContent.create(
+          '이것은 10자 이상의 비공개 질문 내용입니다.',
+        ),
         category: Category.create('React'),
         visibility: Visibility.createPrivate(password),
         authorId: 'author-456',
@@ -83,7 +87,10 @@ describe('GetQuestionUseCase', () => {
     it('비공개 질문을 올바른 비밀번호로 조회할 수 있다', async () => {
       // given
       const questionId = 'question-456';
-      const privateQuestion = createPrivateQuestion(questionId, 'myPassword123');
+      const privateQuestion = createPrivateQuestion(
+        questionId,
+        'myPassword123',
+      );
       mockRepository.findById.mockResolvedValue(privateQuestion);
 
       const command = {
@@ -141,7 +148,9 @@ describe('GetQuestionUseCase', () => {
 
       // when & then
       await expect(useCase.execute(command)).rejects.toThrow(NotFoundException);
-      await expect(useCase.execute(command)).rejects.toThrow('질문을 찾을 수 없습니다');
+      await expect(useCase.execute(command)).rejects.toThrow(
+        '질문을 찾을 수 없습니다',
+      );
 
       expect(mockRepository.findById).toHaveBeenCalledWith(questionId);
       expect(mockRepository.findById).toHaveBeenCalledTimes(2);
@@ -150,7 +159,10 @@ describe('GetQuestionUseCase', () => {
     it('비공개 질문을 비밀번호 없이 조회하면 ForbiddenException이 발생한다', async () => {
       // given
       const questionId = 'question-456';
-      const privateQuestion = createPrivateQuestion(questionId, 'myPassword123');
+      const privateQuestion = createPrivateQuestion(
+        questionId,
+        'myPassword123',
+      );
       mockRepository.findById.mockResolvedValue(privateQuestion);
 
       const command = {
@@ -158,7 +170,9 @@ describe('GetQuestionUseCase', () => {
       };
 
       // when & then
-      await expect(useCase.execute(command)).rejects.toThrow(ForbiddenException);
+      await expect(useCase.execute(command)).rejects.toThrow(
+        ForbiddenException,
+      );
       await expect(useCase.execute(command)).rejects.toThrow(
         '비공개 질문은 비밀번호가 필요합니다',
       );
@@ -169,7 +183,10 @@ describe('GetQuestionUseCase', () => {
     it('비공개 질문을 잘못된 비밀번호로 조회하면 ForbiddenException이 발생한다', async () => {
       // given
       const questionId = 'question-456';
-      const privateQuestion = createPrivateQuestion(questionId, 'correctPassword');
+      const privateQuestion = createPrivateQuestion(
+        questionId,
+        'correctPassword',
+      );
       mockRepository.findById.mockResolvedValue(privateQuestion);
 
       const command = {
@@ -178,11 +195,34 @@ describe('GetQuestionUseCase', () => {
       };
 
       // when & then
-      await expect(useCase.execute(command)).rejects.toThrow(ForbiddenException);
-      await expect(useCase.execute(command)).rejects.toThrow('비밀번호가 일치하지 않습니다');
+      await expect(useCase.execute(command)).rejects.toThrow(
+        ForbiddenException,
+      );
+      await expect(useCase.execute(command)).rejects.toThrow(
+        '비밀번호가 일치하지 않습니다',
+      );
+
+      expect(mockRepository.findById).toHaveBeenCalledWith(questionId);
+    });
+
+    it('삭제된 질문을 조회하면 NotFoundException이 발생한다', async () => {
+      // given
+      const questionId = 'deleted-question-id';
+      const deletedQuestion = createPublicQuestion(questionId);
+      deletedQuestion.markAsDeleted();
+      mockRepository.findById.mockResolvedValue(deletedQuestion);
+
+      const command = {
+        id: questionId,
+      };
+
+      // when & then
+      await expect(useCase.execute(command)).rejects.toThrow(NotFoundException);
+      await expect(useCase.execute(command)).rejects.toThrow(
+        '질문을 찾을 수 없습니다',
+      );
 
       expect(mockRepository.findById).toHaveBeenCalledWith(questionId);
     });
   });
 });
-

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -9,9 +10,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { CreateQuestionResult } from 'src/application/questions/use-cases/create-question.types';
+import { DeleteQuestionResult } from 'src/application/questions/use-cases/delete-question.types';
 import { GetQuestionResult } from 'src/application/questions/use-cases/get-question.types';
 import { CreateQuestionDto } from '../../application/questions/dto/create-question.dto';
 import { CreateQuestionUseCase } from '../../application/questions/use-cases/create-question.usecase';
+import { DeleteQuestionUseCase } from '../../application/questions/use-cases/delete-question.usecase';
 import { GetQuestionUseCase } from '../../application/questions/use-cases/get-question.usecase';
 
 @Controller('questions')
@@ -19,6 +22,7 @@ export class QuestionsController {
   constructor(
     private readonly createQuestionUseCase: CreateQuestionUseCase,
     private readonly getQuestionUseCase: GetQuestionUseCase,
+    private readonly deleteQuestionUseCase: DeleteQuestionUseCase,
   ) {}
 
   @Post()
@@ -36,5 +40,14 @@ export class QuestionsController {
   ): Promise<GetQuestionResult> {
     const command = password ? { id, password } : { id };
     return await this.getQuestionUseCase.execute(command);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  async deleteQuestion(
+    @Param('id') id: string,
+    @Query('authorId') authorId: string,
+  ): Promise<DeleteQuestionResult> {
+    return await this.deleteQuestionUseCase.execute({ id, authorId });
   }
 }

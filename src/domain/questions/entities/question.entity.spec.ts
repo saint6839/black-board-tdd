@@ -64,6 +64,22 @@ describe('Question Entity', () => {
       expect(question.commentCount).toBe(0);
     });
 
+    it('생성 시 삭제 여부는 false로 초기화된다', () => {
+      // given & when
+      const question = createValidQuestion();
+
+      // then
+      expect(question.isDeleted).toBe(false);
+    });
+
+    it('생성 시 삭제 시간은 null로 초기화된다', () => {
+      // given & when
+      const question = createValidQuestion();
+
+      // then
+      expect(question.deletedAt).toBeNull();
+    });
+
     it('생성 시간이 자동으로 기록된다', () => {
       // given
       const beforeCreate = new Date();
@@ -284,6 +300,38 @@ describe('Question Entity', () => {
 
       // when & then
       expect(question.canAccess('wrongPassword')).toBe(false);
+    });
+  });
+
+  describe('소프트 삭제', () => {
+    it('질문을 소프트 삭제할 수 있다', () => {
+      // given
+      const question = createValidQuestion();
+
+      // when
+      question.markAsDeleted();
+
+      // then
+      expect(question.isDeleted).toBe(true);
+    });
+
+    it('소프트 삭제 시 삭제 시간이 기록된다', () => {
+      // given
+      const question = createValidQuestion();
+      const beforeDelete = new Date();
+
+      // when
+      question.markAsDeleted();
+      const afterDelete = new Date();
+
+      // then
+      expect(question.deletedAt).toBeInstanceOf(Date);
+      expect(question.deletedAt!.getTime()).toBeGreaterThanOrEqual(
+        beforeDelete.getTime(),
+      );
+      expect(question.deletedAt!.getTime()).toBeLessThanOrEqual(
+        afterDelete.getTime(),
+      );
     });
   });
 });

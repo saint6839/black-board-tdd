@@ -20,8 +20,8 @@ export class GetQuestionUseCase {
     // Repository에서 질문 조회
     const question = await this.questionRepository.findById(command.id);
 
-    // 질문이 없으면 예외 발생
-    if (!question) {
+    // 질문이 없거나 삭제된 질문이면 예외 발생
+    if (!question || question.isDeleted) {
       throw new NotFoundException('질문을 찾을 수 없습니다');
     }
 

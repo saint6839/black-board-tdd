@@ -23,4 +23,3 @@ export class InMemoryQuestionRepository implements IQuestionRepository {
     this.questions.delete(id);
   }
 }
-
